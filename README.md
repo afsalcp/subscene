@@ -1,6 +1,6 @@
 # subscene
 
-`Small project for Download Subtitle From` [SUBSCENE](https://www.subscene.com/)
+Small project for Download Subtitle From [SUBSCENE](https://www.subscene.com/)
 
 **Important : This is not an official project, so there is no guarantee that it will work for a long time.**
 
@@ -16,9 +16,31 @@ const subscene = require("subscene") //require Module
 
 //Search A Movie/series Name Query
 subscene.search(query).then(results=> {
+
   //results may be an array or null
+
 }).catch(err=> {
+
   //Handle Errors
+
+})
+
+
+/* An Example For How to Use Search Function*/
+
+subscene.search("Money heist").then(results=> {
+  /*
+  [
+    {
+      title:"money heist",
+      url:"https://subscene.com/subtitle/..."
+    },
+    {
+      title:".....",
+      url:"...."
+    }.....
+  ]
+  */
 })
 
 ```
