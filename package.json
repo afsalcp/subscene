@@ -1,0 +1,26 @@
+{
+  "name": "subscene",
+  "version": "1.0.0",
+  "description": "simple project for download subtitle from subscene",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afsalcp/subscene.git"
+  },
+  "keywords": [
+    "subscene",
+    "api",
+    "subtitle",
+    "download",
+    "subscene-api"
+  ],
+  "author": "afsalcp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/afsalcp/subscene/issues"
+  },
+  "homepage": "https://github.com/afsalcp/subscene#readme"
+}
