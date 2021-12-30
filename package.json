@@ -1,10 +1,10 @@
 {
   "name": "subscene",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "simple project for download subtitle from subscene",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./index.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,9 @@
   "bugs": {
     "url": "https://github.com/afsalcp/subscene/issues"
   },
-  "homepage": "https://github.com/afsalcp/subscene#readme"
+  "homepage": "https://github.com/afsalcp/subscene#readme",
+  "dependencies": {
+    "adm-zip": "^0.5.9",
+    "cheerio": "^1.0.0-rc.10"
+  }
 }
