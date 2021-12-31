@@ -94,7 +94,7 @@ subscene.download(subtitlePath,options).then(files=>{  // "subtitlePath" is the 
 }).catch(err=>console.log(err))
 ```
 
-*options : `{object}`*
+#### options : `{object}`
 
 *zip :(default false) :*
 The zip option refers to whether the file buffer to be returned is zip file buffer or unzipped type buffer. default it will be return unzipped type buffer,
