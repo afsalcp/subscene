@@ -4,12 +4,12 @@ Small project for Download Subtitle From [SUBSCENE](https://www.subscene.com/)
 
 **Important : This is not an official project, so there is no guarantee that it will work for a long time.**
 
-**Require Module**
+### Require Module
 ```javascript
 const subscene = require("subscene")
 ```
 
-**How to search a movie?**
+### How to search a movie?
 
 ```javascript
 const subscene = require("subscene") //require Module
@@ -33,11 +33,11 @@ subscene.search("Money heist").then(results=> {
   [
     {
       title:"money heist",
-      url:"https://subscene.com/subtitle/..."
+      path:"/subtitle/money-heist"
     },
     {
       title:".....",
-      url:"...."
+      path:"...."
     }.....
   ]
   */

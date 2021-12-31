@@ -4,7 +4,7 @@
   "description": "simple project for download subtitle from subscene",
   "main": "index.js",
   "scripts": {
-    "test": "node ./index.js"
+    "test": "node ./test/index.js"
   },
   "repository": {
     "type": "git",
@@ -15,7 +15,8 @@
     "api",
     "subtitle",
     "download",
-    "subscene-api"
+    "subscene-api",
+    "subtitle-downloader"
   ],
   "author": "afsalcp",
   "license": "MIT",

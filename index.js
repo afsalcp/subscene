@@ -31,14 +31,15 @@ function search(query = String) {
               $(".search-result ul a").map((i, el)=> {
                 if (el.attribs && el.attribs.href && el.children && el.children[0] && el.children[0].data) {
                   var data = {
-                    url: el.attribs.href,
+                    path: el.attribs.href,
                     title: el.children[0].data
                   }
                   results.push(data)
                 }
               })
+              results=filterItOut(results)
               resolve(results || null)
-            } else reject(err)
+            } else throw err
           }catch(err) {
             reject(err)
           }
@@ -49,6 +50,15 @@ function search(query = String) {
     }
   })
 }
+function filterItOut(res){
+  let results=[]
+  for(let i in res){
+    if(!results.length||results.findIndex(x=>x.path==res[i].path)===-1){
+      results.push(res[i])
+    }
+  }
+  return results
+}
 
 function subtitle(url = String) {
   return new Promise((resolve,
@@ -58,6 +68,7 @@ function subtitle(url = String) {
         null,
         async(err, res)=> {
           try {
+            
             if (!err) {
               var $ = cheerio.load(res.body)
               let results = []
@@ -79,7 +90,7 @@ function subtitle(url = String) {
                     }
                   })
                   results.push({
-                    url,
+                    path:url,
                     title: title || "no title found",
                     lang: lang || "notSp"
                   })
@@ -115,7 +126,7 @@ function sortByLang(subs = Array) {
   }
 }
 
-function download(url = String) {
+function download(url = String , opt=Object) {
   return new Promise((resolve, reject)=> {
     try {
       get(baseUrl+url, null, (err, res)=> {
@@ -134,14 +145,18 @@ function download(url = String) {
               try {
                 if (err)reject(err)
                 else {
+                  if(opt&&opt.zip){
+                    resolve({zip:res.body})
+                  }else{
                   var zip = new unzip(res.body)
                   var zipData = []
                   zip.getEntries().map((e, i)=> {
                     if (e.name && e.getData && e.getData())
                       zipData.push({
-                      filename: e.name, buffer: e.getData()})
+                      filename: e.name,file: e.getData()})
                   })
                   resolve(zipData)
+                  }
                 }
               }catch(err){reject(err)}
             })
@@ -158,5 +173,5 @@ function download(url = String) {
 }
 
 module.exports.search = search
-module.exports.subtitles = subtitle
+module.exports.getSubtitles = subtitle
 module.exports.download = download
