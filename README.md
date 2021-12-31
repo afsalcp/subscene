@@ -126,7 +126,7 @@ subscene.download(subPath).then(file=>{
       },
       {
         filename:"money-heist s05e02.srt",
-        buffer:<some buffer>
+        file:<some buffer>
       }....
     ]
   */
