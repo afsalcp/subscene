@@ -44,3 +44,37 @@ subscene.search("Money heist").then(results=> {
 })
 
 ```
+
+### How to get Subtitles?
+
+
+```javascript
+subscene.getSubtitles(moviePath).then(subtitles=> {// "moviePath" is the "path" returned in the subscene.search() function
+  console.log(subtitles)
+  /*
+    {
+      english:[
+        {
+          title:"money-heist s01e01",
+          path:"/money-heist/english/028292",
+          lang:"English"
+        },
+        {
+          title:"bababa",
+          path:"baba a",
+          lang:"English"
+        }
+      ],
+      hindi:[
+        {
+          title:"hindi sub name",
+          path:"some path",
+          lang:"Hindi"
+        }....
+      ]....
+    },
+    
+  */
+
+}).catch(err=>console.log(err))
+```
