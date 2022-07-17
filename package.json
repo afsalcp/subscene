@@ -1,6 +1,6 @@
 {
-  "name": "subscene",
-  "version": "0.0.1",
+  "name": "node-subscene-api",
+  "version": "1.0.0",
   "description": "simple project for download subtitle from subscene",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "subtitle",
     "download",
     "subscene-api",
-    "subtitle-downloader"
+    "subtitle-downloader",
+    "node-subscene-api"
   ],
   "author": "afsalcp",
   "license": "MIT",
@@ -26,6 +27,7 @@
   "homepage": "https://github.com/afsalcp/subscene#readme",
   "dependencies": {
     "adm-zip": "^0.5.9",
-    "cheerio": "^1.0.0-rc.10"
+    "cheerio": "^1.0.0-rc.10",
+    "got-scraping": "^3.2.9"
   }
 }

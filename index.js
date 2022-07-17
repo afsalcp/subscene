@@ -1,112 +1,80 @@
-const request = require("request"),
+const got = require("got-scraping").gotScraping,
 cheerio = require("cheerio"),
 baseUrl = "https://subscene.com",
-userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/434.36",
 unzip = require("adm-zip")
 
-function get(url, data, cb, type) {
+async function search(query = String) {
   try {
-    request({
-      url, method: type || "post", json: data, headers: {
-        "User-Agent": userAgent
-      }}, (err, res)=> {
-      cb(err, res)
+    if (!query.length)throw "Query Is Null"
+    var res = await got.post(baseUrl+"/subtitles/searchbytitle", {
+      json: {
+        query
+      }})
+    if (!res||!res.body)throw "No Response Found"
+    let $ = cheerio.load(res.body)
+    let results = []
+    $(".search-result ul a").map((i, el)=> {
+      if (el.attribs && el.attribs.href && el.children && el.children[0] && el.children[0].data) {
+        var data = {
+          path: el.attribs.href,
+          title: el.children[0].data
+        }
+        results.push(data)
+      }
     })
-  }catch(err) {
-    cb(err)
+    results = filterItOut(results)
+    return results || null
+  }catch(e) {
+    throw e
   }
 }
 
-function search(query = String) {
-  return new Promise((resolve, reject)=> {
-    try {
-      if (query) {
-        get(baseUrl+"/subtitles/searchbytitle", {
-          query
-        }, async(err, res)=> {
-          try {
-            if (!err) {
-              var $ = cheerio.load(res.body)
-              let results = []
-              $(".search-result ul a").map((i, el)=> {
-                if (el.attribs && el.attribs.href && el.children && el.children[0] && el.children[0].data) {
-                  var data = {
-                    path: el.attribs.href,
-                    title: el.children[0].data
-                  }
-                  results.push(data)
-                }
-              })
-              results=filterItOut(results)
-              resolve(results || null)
-            } else throw err
-          }catch(err) {
-            reject(err)
-          }
-        })
-      }
-    }catch(err) {
-      reject(err)
-    }
-  })
-}
-function filterItOut(res){
-  let results=[]
-  for(let i in res){
-    if(!results.length||results.findIndex(x=>x.path==res[i].path)===-1){
+function filterItOut(res) {
+  let results = []
+  for (let i in res) {
+    if (!results.length || results.findIndex(x=>x.path == res[i].path)===-1) {
       results.push(res[i])
     }
   }
   return results
 }
 
-function subtitle(url = String) {
-  return new Promise((resolve,
-    reject)=> {
-    try {
-      get(baseUrl+ url,
-        null,
-        async(err, res)=> {
+async function subtitle(url = String) {
+  try {
+    if (!url.length) throw "Path Not Specified"
+    var res = await got.get(baseUrl+url)
+    if (!res||!res.body)throw "No Response Found"
+    var $ = cheerio.load(res.body)
+    let results = []
+    $("table tr .a1 a").map((i, e)=> {
+      if (e.attribs && e.attribs.href) {
+        var url = e.attribs.href,
+        title,
+        lang
+        e.children.map((e2, j)=> {
           try {
-            
-            if (!err) {
-              var $ = cheerio.load(res.body)
-              let results = []
-              $("table tr .a1 a").map((i, e)=> {
-                if (e.attribs && e.attribs.href) {
-                  var url = e.attribs.href,
-                  title,
-                  lang
-                  e.children.map((e2, j)=> {
-                    try {
-                      if (e2.type === "tag" && e2.name === "span") {
+            if (e2.type === "tag" && e2.name === "span") {
 
-                        if (!lang)lang = e2.children[0].data.replace(/\t|\n|\r/g, "")
-                        else title = e2.children[0].data.replace(/\t|\n|\r/g, "")
-                      }
-                    }catch(err) {
-                      lang = "notSp",
-                      title = "no Title Found"
-                    }
-                  })
-                  results.push({
-                    path:url,
-                    title: title || "no title found",
-                    lang: lang || "notSp"
-                  })
-                }
-              })
-              resolve(sortByLang(results) || null)
-            } else throw err
+              if (!lang)lang = e2.children[0].data.replace(/\t|\n|\r/g, "")
+              else title = e2.children[0].data.replace(/\t|\n|\r/g, "")
+            }
           }catch(err) {
-            reject(err)
+            lang = "notSp",
+            title = "no Title Found"
           }
-        },
-        "get")
-    }catch(err) {
-      reject(err)
-    }
-  })
+        })
+        results.push({
+          path: url,
+          title: title || "no title found",
+          lang: lang || "notSp"
+        })
+      }
+    })
+    results = sortByLang(results)
+    return results || null
+  } catch (e) {
+    throw e
+  }
 }
 
 function sortByLang(subs = Array) {
@@ -126,50 +94,32 @@ function sortByLang(subs = Array) {
   }
 }
 
-function download(url = String , opt=Object) {
-  return new Promise((resolve, reject)=> {
-    try {
-      get(baseUrl+url, null, (err, res)=> {
-        try {
-          if (!err) {
-            var $ = cheerio.load(res.body),
-            downUrl
-            $("#downloadButton").map((i, e)=> {
-              downUrl = e.attribs.href
-            })
-            request({
-              url: baseUrl+downUrl, headers: {
-                "User-Agent": userAgent
-              }, encoding: null
-            }, async(err, res)=> {
-              try {
-                if (err)reject(err)
-                else {
-                  if(opt&&opt.zip){
-                    resolve({zip:res.body})
-                  }else{
-                  var zip = new unzip(res.body)
-                  var zipData = []
-                  zip.getEntries().map((e, i)=> {
-                    if (e.name && e.getData && e.getData())
-                      zipData.push({
-                      filename: e.name,file: e.getData()})
-                  })
-                  resolve(zipData)
-                  }
-                }
-              }catch(err){reject(err)}
-            })
-          } else reject(err)
-        }catch(err) {
-          reject(err)
-        }
-      },
-        "get")
-    }catch(err) {
-      reject(err)
-    }
-  })
+async function download(url = String, opt = Object) {
+  try {
+    let res = await got.get(baseUrl+url)
+    if (!res||!res.body)throw "No Data Found"
+    let $ = cheerio.load(res.body),
+    downUrl
+    $("#downloadButton").map((i, e)=> {
+      downUrl = e.attribs.href
+    })
+    if (!downUrl)throw "Unexpected Error"
+    res = await got.get(baseUrl+downUrl, {
+      responseType: "buffer"
+    })
+    if (!res||!res.body)throw "File Downloading Error"
+    if (opt && opt.zip)return res.body
+    var zip = new unzip(res.body)
+    var zipData = []
+    zip.getEntries().map((e, i)=> {
+      if (e.name && e.getData && e.getData())
+        zipData.push({
+        filename: e.name, file: e.getData()})
+    })
+    return zipData
+  } catch (e) {
+    throw e
+  }
 }
 
 module.exports.search = search
